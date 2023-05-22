@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Page</title>
+  <style>
+    body{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+    }
+    .box {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-top:10px;
+    }
+    .button{
+        display:inline-block;
+        background-color: #4caf50;
+        border: none;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 16px;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome, {{ username }}</h1>
+
+  <form method="POST" action="{{ url_for('search_books') }}">
+    <label for="title">Title:</label>
+    <input type="text" name="title" id="title" placeholder="Enter book title">
+
+    <label for="category">Category:</label>
+    <select name="category" id="category">
+    <option value=""> Select Category </option>
+    <option value="art"> Art </option>    
+    <option value="biography"> Biography </option>
+    <option value="business"> Business </option>
+    <option value="Children's"> Children's </option>
+    <option value="comics"> Comics </option>
+    <option value="cooking"> Cooking </option>
+    <option value="crime"> Crime </option>
+    <option value="dystopian"> Dystopian </option>
+    <option value="fantasy"> Fantasy </option>
+    <option value="graphicnovels"> Graphic Novels </option>
+    <option value="historicalfiction"> Historical Fiction </option>
+    <option value="horror"> Horror </option>
+    <option value="memoir"> Memoir </option>    
+    <option value="mystery"> Mystery </option>
+    <option value="nonfiction"> Nonfiction </option>
+    <option value="poetry"> Poetry </option>
+    <option value="religion"> Religion </option>
+    <option value="romance"> Romance </option>
+    <option value="science"> Science </option>
+    <option value="sciencefiction"> Science Fiction </option>
+    <option value="selfhelp"> Self-Help </option>
+    <option value="sports"> Sports </option>
+    <option value="thriller"> Thriller </option>
+    <option value="travel"> Travel </option>
+    <option value="youngadult"> Young Adult </option>
+
+    </select>
+
+    <label for="author_first_name">Author First Name:</label>
+    <input type="text" name="author_first_name" id="author_first_name" placeholder="Enter author first name">
+
+    <label for="author_last_name">Author Last Name:</label>
+    <input type="text" name="author_last_name" id="author_last_name" placeholder="Enter author last name">
+
+    <input type="submit" value="Search">
+
+    <div class="box">
+        <a href="{{ url_for('rented_books')}}" class="button"> View Rented Books</a>
+
+    </div>
+    <div class="box">
+        <p><a href="/change_password/user" class="button">Change Password</a></p>
+    </div>
+</body>
+</html>
