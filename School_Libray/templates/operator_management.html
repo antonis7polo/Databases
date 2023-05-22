@@ -1,0 +1,74 @@
+<!-- operator_management.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Operator Management</title>
+</head>
+<body>
+    <h1>Operator Management</h1>
+    
+    <h2>Operator Table</h2>
+    <table>
+        <!-- Table header -->
+        <tr>
+            <th>Operator ID</th>
+            <th>Username</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>School Name</th>
+            <th>Action</th>
+        </tr>
+        <!-- Table content -->
+        {% for operator in operators %}
+        <tr>
+            <td>{{ operator[0] }}</td>
+            <td>{{ operator[1] }}</td>
+            <td>{{ operator[2] }}</td>
+            <td>{{ operator[3] }}</td>
+            <td>{{ operator[4] }}</td>
+            <td>{{ operator[5] }}</td>
+            <td> 
+                <form action="/operator_management" method="POST">
+                    <input type="hidden" name="operator_id" value="{{ operator[0] }}">
+                    <button type="submit" name="action" value="delete">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Operator Registration Table</h2>
+    <table>
+        <!-- Table header -->
+        <tr>
+            <th>Registration ID</th>
+            <th>Username</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>School Name</th>
+            <th>Action</th>
+        </tr>
+        <!-- Table content -->
+        {% for registration in registrations %}
+        <tr>
+            <td>{{ registration[0] }}</td>
+            <td>{{ registration[1] }}</td>
+            <td>{{ registration[2] }}</td>
+            <td>{{ registration[3] }}</td>
+            <td>{{ registration[4] }}</td>
+            <td>{{ registration[5] }}</td>
+            <td>
+                <form action="/operator_management" method="POST">
+                    <input type="hidden" name="operator_username" value="{{ registration[1] }}">
+                    <button type="submit" name="action" value="accept">Accept</button>
+                    <button type="submit" name="action" value="decline">Decline</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
+

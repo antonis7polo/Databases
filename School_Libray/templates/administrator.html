@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Administrator Page</title>
+</head>
+<body>
+    <h1>Welcome, {{ username }}!</h1>
+    <h3>Administrator Dashboard</h3>
+    <p><a href="/change_password/administrator">Change Password</a></p>
+    <form action="/backup_database" method="POST">
+        <label for="backup_path">Backup Path:</label>
+        <input type="text" id="backup_path" name="backup_path" required>
+        <input type="submit" value="Create Database Backup">
+    </form>
+    <p></p>
+    <form action="/restore_database" method="POST" enctype="multipart/form-data">
+        <label for="restore_file">Restore File:</label>
+        <input type="file" id="restore_file" name="restore_file" required>
+        <input type="submit" value="Restore Database">
+    </form>
+    <p><a href="/school" class="btn btn-primary">Schools</a></p>
+    <p><a href="/operator_management" class="btn btn-primary">Manage Operators</a></p>
+</body>  
+</html>
