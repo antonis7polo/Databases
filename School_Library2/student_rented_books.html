@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rented Books</title>
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Rented Books</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>ISBN</th>
+        <th>Rental Date</th>
+        <th>Return Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for book in rented_books %}
+      <tr>
+        <td>{{ book[0] }}</td>
+        <td>{{ book[1] }}</td>
+        <td>{{ book[2] }}</td>
+        <td>{{ book[3] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

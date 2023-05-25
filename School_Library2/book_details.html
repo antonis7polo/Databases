@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book Details</title>
+    <style>
+        .container {
+            display: flex;
+        }
+        .image-container {
+            flex: 0 0 30%;
+        }
+        .image {
+            max-width: 100%;
+        }
+        .details-container {
+            flex: 0 0 70%;
+            padding-left: 20px;
+        }
+        .reserve-button {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Book Details</h1>
+    <div class="container">
+        <div class="image-container">
+            <img class="image" src="{{ book_info[7] }}" alt="Book Image">
+        </div>
+        <div class="details-container">
+            <h2>{{ book_info[1] }}</h2>
+            <p>ISBN: {{ book_info[0] }}</p>
+            <p>Number of Pages: {{ book_info[2] }}</p>
+            <p>Publisher: {{ book_info[3] }}</p>
+            <p>Language: {{ book_info[4] }}</p>
+            <p>Authors: {{ book_info[8] }}</p>
+            <p>Available Copies: {{ book_info[6] }}</p>
+            <p>Summary: {{ book_info[5] }}</p>
+            <form action="/reserve-user-book" method="post">
+                <input type="hidden" name="isbn" value="{{ book_info[0] }}">
+                <input type="hidden" name="username" value="{{ session.username }}">
+                <input type="submit" value="Reserve" class="reserve-button">
+            </form>
+        </div>
+    </div>
+</body>
+</html>

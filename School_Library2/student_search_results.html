@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Results: Available Books</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Search Results: Available Books</h1>
+    <table>
+        <tr>
+            <th>ISBN</th>
+            <th>Title</th>
+            <th>Number Of Pages</th>
+            <th>Publisher</th>
+            <th>Language</th>
+            <th>Author(s)</th>
+            <th>Available Copies</th>
+            <th>Summary</th>
+        </tr>
+        {% for result in results %}
+        <tr>
+            <td><a href="/book/{{ result[0] }}">{{result[0]}}</a></td>
+            <td>{{ result[1] }}</td>
+            <td>{{ result[2] }} </td>
+            <td>{{ result[3] }} </td>
+            <td>{{ result[4] }} </td>
+            <td>{{ result[7] }} </td>
+            <td>{{ result[6] }}</td>
+            <td>{{ result[5] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
+
