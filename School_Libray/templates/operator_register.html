@@ -1,0 +1,127 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .error-message {
+            color: red;
+        }
+
+        p {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .top-buttons {
+            position: absolute;
+            top: 0;
+            right: 0;
+            margin-top: 10px;
+        }
+
+        .top-buttons button, .top-buttons a {
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .top-buttons button:hover, .top-buttons a:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-buttons">
+        <a href="javascript:history.back()">Go Back</a>
+    </div>
+    <h1>Registration Page</h1>
+    <form method="POST" action="/operator/register">
+        {{ form.hidden_tag() }}
+        <p>
+            <label for="username">{{ form.username.label }}</label>
+            {{ form.username() }}
+            {% if form.username.errors %}
+            <p class="error-message">{{ form.username.errors[0] }}</p>
+            {% endif %}
+        </p>
+        <p>
+            <label for="password">{{ form.password.label }}</label>
+            {{ form.password() }}
+        </p>
+        <p>
+            <label for="first_name">{{ form.first_name.label }}</label>
+            {{ form.first_name() }}
+        </p>
+        <p>
+            <label for="last_name">{{ form.last_name.label }}</label>
+            {{ form.last_name() }}
+        </p>
+        <p>
+            <label for="email">{{ form.email.label }}</label>
+            {{ form.email() }}
+            {% if form.email.errors %}
+            <p class="error-message">{{ form.email.errors[0] }}</p>
+            {% endif %}
+        </p>
+        <p>
+            <label for="school_name">{{ form.school_name.label }}</label>
+            {{ form.school_name(class="form-select") }}
+        </p>
+        <p>
+            {{ form.submit(class="btn btn-primary") }}
+        </p>
+    </form>
+</body>
+</html>
+

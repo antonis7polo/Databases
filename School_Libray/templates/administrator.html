@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Administrator Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #444;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        .btn-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            box-shadow: 0px 2px 10px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    {% if message %}
+    <div class="alert alert-info">
+        {{ message }}
+    </div>
+    {% endif %}
+    <h1>Welcome, {{ username }}!</h1>
+    <h3>Administrator Dashboard</h3>
+    <p><a href="/administrator/change_password" class="btn">Change Password</a></p>
+    <div class="btn-container">
+        <a href="/administrator/school" class="btn">Schools</a>
+        <a href="/administrator/operator_management" class="btn">Manage Operators</a>
+        <a href="/administrator/rentals_by_school" class="btn">Number of Rentals per School</a>
+        <a href="/administrator/query_authors_teachers_categories" class="btn">Genre Query</a>
+        <a href="/administrator/teachers_rentals" class="btn">Most Young Teacher Rentals</a>
+        <a href="/administrator/authors_with_no_rentals" class="btn">Authors With No Rentals</a>
+        <a href="/administrator/high_activity_operators" class="btn">High Activity Operators</a>
+        <a href="/administrator/top_category_combinations" class="btn">Top Category Combinations</a>
+        <a href="/administrator/authors_fewer_books" class="btn">Authors With Fewer Books</a>
+        <form action="/administrator/backup_database" method="POST">
+            <label for="backup_dir">Backup Path:</label>
+            <input type="text" id="backup_dir" name="backup_dir" required>
+            <button type="submit" class="btn">Create Database Backup</button>
+        </form>
+        <form action="/administrator/restore_database" method="POST" enctype="multipart/form-data">
+            <label for="restore_file">Restore File:</label>
+            <input type="file" id="restore_file" name="restore_file" required>
+            <button type="submit" class="btn">Restore Database</button>
+        </form>
+    </div>
+</body>
+</html>
+{% endblock %}
