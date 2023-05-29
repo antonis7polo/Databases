@@ -917,7 +917,6 @@ def update_book(isbn):
                         "Summary = %s, Image_URL = %s WHERE ISBN = %s",
                         (title, num_pages, publisher, language, summary, image_url, isbn))
         else:
-            print(5)
             cursor.execute("UPDATE Book SET Title = %s, Number_Of_Pages = %s, Publisher = %s, Language = %s, "
                         "Summary = %s WHERE ISBN = %s",
                         (title, num_pages, publisher, language, summary, isbn))
@@ -1345,17 +1344,68 @@ def operator_users():
         }
         users.append(user)
 
+    pending_query = "SELECT pr.Registration_ID, pr.Username, pr.First_Name, pr.Last_Name, pr.Email, pr.School_Name, " \
+                    "pr.Date_of_Birth, pr.Is_Teacher, pr.Password " \
+                    "FROM Pending_Registrations pr " \
+                    "INNER JOIN School s ON pr.School_Name = s.Name " \
+                    "INNER JOIN Operator o ON s.Operator_ID = o.Operator_ID " \
+                    "WHERE o.Username = %s "
+    cursor.execute(pending_query, (operator_username,))
+    pending_result = cursor.fetchall()
+    pending_users = []
+    for row in pending_result:
+        pending_user = {
+            'registration_id': row[0],
+            'username': row[1],
+            'first_name': row[2],
+            'last_name': row[3],
+            'email': row[4],
+            'school_name': row[5],
+            'date_of_birth': row[6].strftime('%Y-%m-%d'),
+            'is_teacher': bool(row[7]),
+            'password': row[8]
+        }
+        pending_users.append(pending_user)
+
     if request.method == 'POST':
-        user_id = request.form['user_id']
-        # Delete the selected user from the database
-        delete_query = "DELETE FROM User WHERE User_ID = %s"
-        cursor.execute(delete_query, (user_id,))
+        action_type = request.form['action_type'] 
+        if action_type == "delete":
+            user_id = request.form['user_id']
+            # Delete the selected user from the database
+            delete_query = "DELETE FROM User WHERE User_ID = %s"
+            cursor.execute(delete_query, (user_id,))
+            message='User deleted successfully'
+        elif action_type == "accept":
+            registration_id = request.form['registration_id']
+            username = request.form['username']
+            password = request.form['password']
+            first_name = request.form['first_name']
+            last_name = request.form['last_name']
+            email = request.form['email']
+            school_name = request.form['school_name']
+            date_of_birth = request.form['date_of_birth']
+            is_teacher = request.form['is_teacher']
+
+            print(pending_user)
+            insert_query = "INSERT INTO User (Username, Password, First_Name, Last_Name, Email, School_Name, Date_Of_Birth, Is_Teacher) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            cursor.execute(insert_query, (username, password, first_name, last_name, email, school_name, date_of_birth, is_teacher))
+            print(cursor.statement)
+            connection.commit()
+            delete_query = "DELETE FROM Pending_Registrations WHERE Registration_ID = %s"
+            cursor.execute(delete_query, (registration_id,))
+            message='User accepted successfully'
+        elif action_type == "decline":
+            registration_id = request.form['registration_id']
+            delete_query = "DELETE FROM Pending_Registrations WHERE Registration_ID = %s"
+            cursor.execute(delete_query, (registration_id,))
+            message='User declined successfully'
+        else:
+            message='Unknown action type'
         connection.commit()
-        message='User deleted successfully'
         return render_template('operator.html', username = operator_username, message=message)
 
     message = request.args.get("message")
-    return render_template('operator_users.html', users=users, message=message)
+    return render_template('operator_users.html', users=users, pending_users=pending_users, message=message)
 
 @app.route('/user/books', methods=['GET', 'POST'])
 def user_books():
@@ -1741,7 +1791,7 @@ def query_authors_teachers_categories():
                          "WHERE Category.Genre = %s " \
                          "AND User.Is_Teacher = TRUE " \
                          "AND Rental.Rental_Date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)" \
-                         "ORDER BY User.First_Name, User.Last_Name"
+                         "ORDER BY User.Username"
         cursor.execute(teachers_query, (genre,))
         teachers = cursor.fetchall()
 
@@ -1762,7 +1812,7 @@ def get_teachers_rentals():
             "AND User.Date_Of_Birth > DATE_SUB(CURDATE(), INTERVAL 40 YEAR) " \
             "GROUP BY User_ID " \
             "ORDER BY Number_Of_Rentals DESC " \
-            "LIMIT 10"
+            "LIMIT 20"
 
     cursor.execute(query)
     result = cursor.fetchall()
