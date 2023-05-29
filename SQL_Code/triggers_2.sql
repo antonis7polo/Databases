@@ -14,7 +14,7 @@ begin
                and datediff(curdate(),reservation_date)<7
      );
      if (new.user_id in (SELECT User_ID FROM User WHERE Is_Teacher = TRUE) and reservation>=1) or (new.user_id in (SELECT User_ID FROM User WHERE Is_Teacher = False) and reservation>=2) then
-     signal sqlstate '45000' set message_text = 'User has exceeded weekly reservation limit';
+     signal sqlstate '45000' set message_text = 'You have exceeded weekly reservation limit';
      end if;
 end $$
 DELIMITER ;
@@ -54,7 +54,7 @@ begin
           and return_date is null) 
           then
           signal sqlstate '45000'
-          set message_text = 'Cannot reserve a book that user has already rented and not returned';
+          set message_text = 'You cannot reserve a book that you have already rented and not returned';
      end if;
 end $$
 DELIMITER ;
@@ -74,10 +74,31 @@ begin
           ) 
           then
           signal sqlstate '45000'
-          set message_text = 'User is not eligible to reserve a book because he has an existing rental that is overdue';
+          set message_text = 'You are not eligible to reserve a book because you have an existing rental that is overdue';
      end if;
 end $$
 DELIMITER ;
+
+--PREVENT RENTAL DUE TO DELAY TRIGGER--
+DELIMITER $$
+create trigger prevent_rental_due_to_delay 
+before insert on Rental
+for each row
+begin
+     if exists 
+          (select * from rental
+               where user_id = new.user_id
+               and datediff(curdate(),rental_date)>7
+               and return_date is null
+          ) 
+          then
+          signal sqlstate '45000'
+          set message_text = 'User is not eligible to rent a book because he has an existing rental that is overdue';
+     end if;
+end $$
+DELIMITER ;
+
+
 
 --UNIQUE EMAILS user--
 DELIMITER //
@@ -239,104 +260,31 @@ begin
 end// 
 DELIMITER ;
 
-
-
----------------
+--------------------
 DELIMITER //
 
-CREATE PROCEDURE insert_reservations_to_rentals()
-BEGIN
-  DECLARE done INT DEFAULT FALSE;
-  DECLARE reservation_id1 INT UNSIGNED;
-  DECLARE isbn1 CHAR(13) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-  DECLARE user_id1 INT UNSIGNED;
-  DECLARE reservation_date1 DATE;
-  DECLARE available_copies1 INT UNSIGNED;
-  declare rents int UNSIGNED;
-
-  DECLARE cur CURSOR FOR SELECT Reservation_ID, ISBN, User_ID, Reservation_Date FROM Book_Reservation
-  WHERE Is_Rented = False
-  ORDER BY Reservation_Date ASC;
-
-  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-  OPEN cur;
-
-
-  
-  read_loop: LOOP
-    FETCH cur INTO reservation_id1, isbn1, user_id1, reservation_date1;
-    IF done THEN
-      LEAVE read_loop;
-    END IF;
-
-
-    select count(*) INTO rents
-    from rental
-    where user_id = user_id1
-    and datediff(curdate(),rental_date)<7;
-
-    IF (user_id1 in (SELECT User_ID FROM User WHERE Is_Teacher = TRUE) and rents>=1) or (user_id1 in (SELECT User_ID FROM User WHERE Is_Teacher = False) and rents>=2) then  
-        ITERATE read_loop;
-    END IF;
-
-    
-    SELECT sb.Available_Copies INTO available_copies1
-    FROM School_Books sb
-    JOIN User u ON u.School_Name = sb.School_Name
-    JOIN School s ON s.Name = sb.School_Name
-    WHERE sb.ISBN = isbn1 AND u.User_ID = user_id1 AND s.Name = u.School_Name;
-
-
-    
-    IF (available_copies1 = 0) THEN
-        ITERATE read_loop;
-    END IF;
-
-    INSERT INTO Rental (ISBN, User_ID, Rental_Date, Return_Date) VALUES (isbn1, user_id1, CURDATE(), NULL);
-    UPDATE  Book_Reservation 
-    SET Is_Rented = True
-    WHERE Reservation_ID = reservation_id1;
-   
-
-  END LOOP;
-  CLOSE cur;
-  
-END//
-
-DELIMITER ;
-
-
-
----------------------
-DELIMITER //
-CREATE TRIGGER trg_book_reservation_ins BEFORE INSERT ON book_reservation
+CREATE TRIGGER before_reservation_trigger
+BEFORE INSERT ON Book_Reservation
 FOR EACH ROW
 BEGIN
-    IF NOT EXISTS (SELECT * FROM User u 
-                   JOIN school_books sb ON u.School_Name = sb.School_Name 
-                   WHERE u.User_ID = NEW.User_ID AND sb.ISBN = NEW.ISBN) THEN
-        SIGNAL SQLSTATE '45000' 
-        SET MESSAGE_TEXT = "Cannot insert book_reservation record for a book not available in the user's school.";
+    DECLARE school_name1 VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+    DECLARE count INT;
+    
+    -- Get the school name of the user
+    SELECT School_Name INTO school_name1 FROM User WHERE User_ID = NEW.User_ID;
+    
+    -- Check if the book belongs to the user's school library
+    SELECT COUNT(*) INTO count FROM School_Books WHERE School_Name = school_name1 AND ISBN = NEW.ISBN;
+    
+    -- If the book doesn't belong to the user's school library, raise an error
+    IF count = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Reservation failed. Book does not belong to the user''s school library.';
     END IF;
-END//
-DELIMITER ;
-
-
-
---------------
-DELIMITER //
-
-CREATE PROCEDURE create_reservation(
-  IN isbn_param CHAR(13),
-  IN user_id_param INT UNSIGNED
-)
-BEGIN
-    INSERT INTO Book_Reservation(ISBN, User_ID, Reservation_Date)
-    VALUES (isbn_param, user_id_param, CURDATE());
-END//
+END //
 
 DELIMITER ;
+
+
 --------------------
 DELIMITER //
 
@@ -358,27 +306,39 @@ DELIMITER ;
 DELIMITER //
 CREATE PROCEDURE create_rental(
   IN isbn_param CHAR(13),
-  IN user_id_param INT UNSIGNED
+  IN user_username1 VARCHAR(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
 )
 BEGIN
+    DECLARE user_id1 INT;
+
+    -- Check if the operator already exists in another school
+    SELECT u.user_ID INTO user_id1 
+    FROM User u
+    WHERE u.Username = user_username1;
+
     INSERT INTO Rental(ISBN, User_ID, Rental_Date)
-    VALUES (isbn_param, user_id_param, CURDATE());
+    VALUES (isbn_param, user_id1, CURDATE());
 END//
 
 DELIMITER ;
 
 ----------------------------------------------
+
 DELIMITER //
-CREATE EVENT delete_old_reservations
-ON SCHEDULE EVERY 1 DAY
-STARTS '2023-05-19 00:00:00'
-ON COMPLETION PRESERVE
+
+CREATE EVENT delete_old_reservations_event
+ON SCHEDULE
+    EVERY 1 DAY
+    STARTS CURRENT_TIMESTAMP
 DO
-  BEGIN
     DELETE FROM Book_Reservation
-    WHERE reservation_date < DATE_SUB(NOW(), INTERVAL 1 WEEK);
-END//
+    WHERE Reservation_Date < DATE_SUB(CURDATE(), INTERVAL 1 WEEK);
+
+//
+
 DELIMITER ;
+
+
 -----------------------------------------------
 
 DELIMITER //
@@ -448,19 +408,6 @@ DELIMITER ;
 ----------
 
 DELIMITER //
-CREATE TRIGGER before_update_school
-BEFORE UPDATE ON School
-FOR EACH ROW
-BEGIN
-    IF (OLD.Operator_ID IS NOT NULL) AND (NEW.Operator_ID  IS NOT NULL)THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Operator already exists for this school';
-    END IF;
-END //
-DELIMITER ;
-
-
-----------------------
-DELIMITER //
 
 CREATE TRIGGER prevent_operator_duplicate
 BEFORE INSERT ON School
@@ -472,6 +419,26 @@ BEGIN
     SELECT COUNT(*) INTO operator_count
     FROM School
     WHERE Operator_ID = NEW.Operator_ID;
+
+    -- Raise an error if the operator already exists in another school
+    IF operator_count > 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'An operator cannot be assigned to more than one school.';
+    END IF;
+END//
+DELIMITER ;
+-------------------------
+DELIMITER //
+CREATE TRIGGER prevent_operator_duplicate_on_update
+BEFORE UPDATE ON School
+FOR EACH ROW
+BEGIN
+    DECLARE operator_count INT;
+
+    -- Check if the operator already exists in another school
+    SELECT COUNT(*) INTO operator_count
+    FROM School
+    WHERE Operator_ID = NEW.Operator_ID AND NEW.Name <> Name;
 
     -- Raise an error if the operator already exists in another school
     IF operator_count > 0 THEN
@@ -500,4 +467,8 @@ BEGIN
 END //
 
 DELIMITER ;
+
+
+
+
 
