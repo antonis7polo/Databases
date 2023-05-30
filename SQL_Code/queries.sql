@@ -137,20 +137,33 @@ WHERE r.Return_Date IS NULL
 
 
 --3.2.3
-
+--a
 SELECT User.User_ID, User.Username, Category.Genre, AVG(Published_Book_Review.Likert_Review) AS avg_reviews_per_user_and_category
+FROM User 
+INNER JOIN Published_Book_Review ON User.User_ID = Published_Book_Review.User_ID 
+INNER JOIN Book_Category ON Published_Book_Review.ISBN = Book_Category.ISBN 
+INNER JOIN Category ON Book_Category.Category_Id = Category.Category_Id 
+WHERE Category.Genre LIKE CONCAT('%', [genre_value], '%')
+AND User.Username LIKE CONCAT('%', [username_value], '%')
+AND User.School_Name = [school_name_value]
+GROUP BY User.User_ID, Category.Category_ID
+
+--b
+SELECT User.User_ID, User.Username, User.First_Name, User.Last_Name, AVG(Published_Book_Review.Likert_Review) 
 FROM User
 INNER JOIN Published_Book_Review ON User.User_ID = Published_Book_Review.User_ID
-INNER JOIN Book_Category ON Published_Book_Review.ISBN = Book_Category.ISBN
-INNER JOIN Category ON Book_Category.Category_Id = Category.Category_Id
-INNER JOIN School ON School.Name = User.School_Name
-WHERE Category.Genre LIKE CONCAT('%', [genre], '%')
-  AND User.Username LIKE CONCAT('%', [username], '%')
-  AND School.Operator_ID = (SELECT Operator_ID FROM Operator WHERE Username = [operator_username])
-GROUP BY User.User_ID, Category.Category_ID;
+WHERE User.Username = [username_value]
 
+GROUP BY User.User_ID
 
-
+SELECT Category.Genre, AVG(Published_Book_Review.Likert_Review)
+FROM Category 
+INNER JOIN Book_Category ON Category.Category_ID = Book_Category.Category_ID
+INNER JOIN Published_Book_Review ON Book_Category.ISBN = Published_Book_Review.ISBN
+INNER JOIN User ON Published_Book_Review.User_ID = User.User_ID
+WHERE Category.Genre = [genre_value]
+AND User.School_Name = %s
+GROUP BY Category.Category_ID
 
 
 --3.3.1
@@ -180,7 +193,3 @@ FROM Rental
 INNER JOIN Book ON Rental.ISBN = Book.ISBN
 INNER JOIN User ON Rental.User_ID = User.User_ID
 WHERE User.Username = [username];
-
-
-
-
