@@ -1,19 +1,16 @@
-from flask import Flask, request, render_template, redirect, url_for, session, send_from_directory, flash
+from flask import Flask, request, render_template, redirect, url_for, session, flash
 import mysql.connector
-from flask_mysqldb import MySQL
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import TextAreaField,SelectMultipleField, IntegerField, StringField, PasswordField, BooleanField, SubmitField, RadioField, SelectField, validators
-from wtforms.validators import DataRequired, Email, EqualTo
+from wtforms import  IntegerField, StringField, PasswordField, SubmitField, RadioField, SelectField, validators
+from wtforms.validators import DataRequired, Email
 from werkzeug.utils import secure_filename
 import subprocess
 from urllib.parse import urlencode
-from datetime import datetime, timedelta
+from datetime import datetime
 import os
 import requests
 
-## __name__ is the name of the module. When running directly from python, it will be 'school_lib'
-## Outside of this module, as in run.py, it is '__main__' by default
 
 ## Create an instance of the Flask class to be used for request routing
 app = Flask(__name__)
@@ -21,14 +18,14 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'dblab21'
 app.config["MYSQL_USER"] = 'root'
 app.config["MYSQL_PASSWORD"] = 'El20022!'
-app.config["MYSQL_DB"] = 'School_Library'
+app.config["MYSQL_DB"] = 'School_Library_New'
 app.config["MYSQL_HOST"] = 'localhost'
 
 connection = mysql.connector.connect(
         host='localhost',
         user='root',
         password='El20022!',
-        database='School_Library'
+        database='School_Library_New'
 )
 
 cursor = connection.cursor()
@@ -51,7 +48,7 @@ class OperatorRegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     first_name = StringField('First Name', validators=[DataRequired()])
     last_name = StringField('Last Name', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
+    email = StringField('Email', validators=[DataRequired()])
     school_name = SelectField('School', validators=[DataRequired()])
     submit = SubmitField('Register')
 
@@ -71,7 +68,7 @@ class AddSchoolForm(FlaskForm):
     street_number = StringField('Street Number', validators=[validators.DataRequired()])
     postal_code = StringField('Postal Code', validators=[validators.DataRequired()])
     city = StringField('City', validators=[validators.DataRequired()])
-    email = StringField('Email', validators=[validators.DataRequired(), validators.Email()])
+    email = StringField('Email', validators=[validators.DataRequired()])
     phone = StringField('Phone', validators=[validators.DataRequired()])
     principal_full_name = StringField('Principal Full Name', validators=[validators.DataRequired()])
     operator = SelectField('Operator', choices=[('', 'None')], validators=[validators.DataRequired()])
@@ -84,7 +81,7 @@ class UpdateSchoolForm(FlaskForm):
     street_number = StringField('Street Number', validators=[validators.DataRequired()])
     postal_code = StringField('Postal Code', validators=[validators.DataRequired()])
     city = StringField('City', validators=[validators.DataRequired()])
-    email = StringField('Email', validators=[validators.DataRequired(), validators.Email()])
+    email = StringField('Email', validators=[validators.DataRequired()])
     phone = StringField('Phone', validators=[validators.DataRequired()])
     principal_full_name = StringField('Principal Full Name', validators=[validators.DataRequired()])
     operator = SelectField('Operator', choices=[('', 'None')], validators=[validators.DataRequired()])
@@ -100,36 +97,6 @@ class BookForm(FlaskForm):
     summary = StringField('Summary')
     image = FileField('Book Image', validators=[FileAllowed(['jpg', 'png', 'gif', 'jpeg'], 'Images only!')])
     available_copies = IntegerField('Available Copies', validators=[DataRequired()])
-
-# Folder to store images
-IMG_FOLDER = "/Users/harrypapadakis/Documents/6th_semester/databases/project/school_lib/static/images"
-
-# Ensure the directory exists
-#os.makedirs(IMG_FOLDER, exist_ok=True)
-
-# Fetch ISBNs from the Book table
-#cursor.execute("SELECT ISBN FROM Book")
-#books = cursor.fetchall()
-
-#for book in books:
-    #isbn = book[0]
-
-    # Generate the URL for a random image from Lorem Picsum
-    #url = f"https://picsum.photos/200/300?random={isbn}"
-
-    # Fetch the image data
-    #response = requests.get(url)
-
-    # Save the image to a file
-    #img_file_path = os.path.join(IMG_FOLDER, f"{isbn}.jpg")
-    #with open(img_file_path, 'wb') as img_file:
-        #img_file.write(response.content)
-
-    # Update the Image_URL field in the Book table
-    #image_url = f"images/{isbn}.jpg"
-    #cursor.execute(f"UPDATE Book SET Image_URL = '{image_url}' WHERE ISBN = '{isbn}'")
-    #connection.commit()
-
 
 
 @app.route('/')
@@ -361,7 +328,7 @@ def change_operator_password():
 
         # If the current password is incorrect or user not found, display an error message
         error_message = 'Invalid current password'
-        return render_template('change_password.html', form=form, error_message=error_message)
+        return render_template('change_password.html', form=form, error_message=error_message, user_type = 'operator')
 
     return render_template('change_password.html', form=form, user_type = 'operator')
 
@@ -392,7 +359,7 @@ def change_user_password():
 
         # If the current password is incorrect or user not found, display an error message
         error_message = 'Invalid current password'
-        return render_template('change_password.html', form=form, error_message=error_message)
+        return render_template('change_password.html', form=form, error_message=error_message, user_type = 'user')
 
     return render_template('change_password.html', form=form, user_type = 'user')
 
@@ -425,7 +392,7 @@ def change_admin_password():
 
         # If the current password is incorrect or user not found, display an error message
         error_message = 'Invalid current password'
-        return render_template('change_password.html', form=form, error_message=error_message)
+        return render_template('change_password.html', form=form, error_message=error_message, user_type = 'administrator')
 
     return render_template('change_password.html', form=form, user_type = 'administrator')
 
@@ -552,8 +519,7 @@ def add_school():
             print(error)
             print(error.errno)
             if error.errno == 1644:
-                if 'more' in str(error):
-                    error_message = 'An operator cannot be assigned to more than one school.'
+                error_message = error.msg
             elif error.errno == 1062:
                 error_message = 'A School with this name already exists.'
             else:
@@ -600,7 +566,6 @@ def update_school(name):
         phone = form.phone.data
         principal_full_name = form.principal_full_name.data
         operator_id = int(form.operator.data)
-
         if operator_id > 0:
             query = "UPDATE School SET Street = %s, Street_Number = %s, Postal_Code = %s, City = %s, " \
                     "Email = %s, Phone = %s, Principal_Full_Name = %s, Operator_ID = %s WHERE Name = %s"
@@ -609,7 +574,6 @@ def update_school(name):
             query = "UPDATE School SET Street = %s, Street_Number = %s, Postal_Code = %s, City = %s, " \
                     "Email = %s, Phone = %s, Principal_Full_Name = %s, Operator_ID = NULL WHERE Name = %s"
             values = (street, street_number, postal_code, city, email, phone, principal_full_name, name)
-
         try:
             cursor.execute(query, values)
             connection.commit()
@@ -617,11 +581,11 @@ def update_school(name):
             return render_template('administrator.html', username=username, message=message)
         except mysql.connector.Error as error:
             if error.errno == 1644:
-                error_message = 'An operator cannot be assigned to more than one school.'
+                error_message = error.msg
             else:
-                error_message = 'An error occurred while updating the school.'
-
-            return render_template('update_school.html', form=form, school=name, error_message=error_message)
+                error_message = 'Invalid Postal Code'
+      
+            return render_template('update_school.html', form=form, school=name, error_message = error_message)
 
     return render_template('update_school.html', form=form, school=name)
 
@@ -780,7 +744,6 @@ def add_book():
             return render_template('add_book.html', form=form, error_message= error_message)   
 
         if not book_result:
-            print("hello")
             # The book doesn't exist, so insert it into the book table
             try:
                 cursor.execute("INSERT INTO Book (ISBN, Title, Number_Of_Pages, Publisher, Language, Summary, Image_URL) "
@@ -944,9 +907,17 @@ def update_book(isbn):
             else:
                 cursor.execute("SELECT Author_ID FROM Author WHERE First_Name = %s AND Last_Name = %s",
                                (first_name, last_name))
-                
-            author_data = cursor.fetchone()
-    
+            try:
+                author_data = cursor.fetchone()
+                if cursor.fetchone() is not None:
+                    error_message = 'There are multiple authors with the same full name. Please provide the author ID.'
+                    return render_template('update_book.html', form=form, book=book, authors=authors,
+                        categories=categories, keywords=keywords, error_message = error_message)
+            except mysql.connector.errors.InternalError as error:
+                        error_message = 'An error occurred while fetching author data.'
+                        return render_template('update_book.html', form=form, book=book, authors=authors,
+                           categories=categories, keywords=keywords, error_message = error_message)
+                      
     
             if author_data:
                 author_id = author_data[0]
@@ -1576,7 +1547,7 @@ def teacher_profile():
         'first_name': user_data[3],
         'last_name': user_data[4],
         'email': user_data[5],
-        'date_of_birth': user_data[9].strftime('%Y-%m-%d') if user_data[4] else ''
+        'date_of_birth': user_data[7].strftime('%Y-%m-%d') 
     
     }
 
@@ -1635,15 +1606,13 @@ def operator_reviews():
     if not result:
         return "Operator not found"
 
-    school_name = result[0]
-
     # Retrieve book reviews from students in the operator's school
     query = "SELECT r.Review_ID, b.Title, u.Username, r.Review_Text, r.Review_Date, r.Likert_Review " \
             "FROM Book_Review r " \
             "INNER JOIN Book b ON r.ISBN = b.ISBN " \
             "INNER JOIN User u ON r.User_ID = u.User_ID " \
             "WHERE u.School_Name = %s"
-    cursor.execute(query, (school_name,))
+    cursor.execute(query, (result[0],))
     reviews_data = cursor.fetchall()
 
     reviews = []
@@ -1836,8 +1805,9 @@ def get_authors_with_no_rentals():
             "INNER JOIN Book_Author ON Author.Author_ID = Book_Author.Author_ID " \
             "LEFT JOIN Rental ON Book_Author.ISBN = Rental.ISBN " \
             "GROUP BY Author.Author_ID " \
-            "HAVING COUNT(Rental.Rental_ID) = 0"
-
+            "HAVING COUNT(Rental.Rental_ID) = 0 " \
+            "ORDER BY Author.First_Name, Author.Last_Name"
+    
     cursor.execute(query)
     authors = cursor.fetchall()
 
@@ -1926,7 +1896,8 @@ def authors_fewer_books():
             "                   INNER JOIN Book_Author ba2 ON a2.Author_ID = ba2.Author_ID " \
             "                   GROUP BY a2.Author_ID " \
             "                   ORDER BY COUNT(*) DESC " \
-            "                   LIMIT 1) - 5"
+            "                   LIMIT 1) - 5 " \
+            "ORDER BY Books_Written DESC"
     
     cursor.execute(query)
     result = cursor.fetchall()
@@ -2073,7 +2044,10 @@ def get_overdue_rentals():
 def avg_reviews_per_category():
     genre = request.args.get('genre')
     user_username = request.args.get('user_username')
-    operator_username = session.get('username')
+    operator_id = session.get('id')
+    query = 'SELECT Name FROM School WHERE Operator_ID = %s'
+    cursor.execute(query,(operator_id,))
+    result = cursor.fetchone()
 
     query = """
         SELECT User.User_ID, User.Username, Category.Genre, AVG(Published_Book_Review.Likert_Review) AS avg_reviews_per_user_and_category
@@ -2081,14 +2055,13 @@ def avg_reviews_per_category():
         INNER JOIN Published_Book_Review ON User.User_ID = Published_Book_Review.User_ID 
         INNER JOIN Book_Category ON Published_Book_Review.ISBN = Book_Category.ISBN 
         INNER JOIN Category ON Book_Category.Category_Id = Category.Category_Id 
-        INNER JOIN School ON School.Name = User.School_Name
         WHERE Category.Genre LIKE CONCAT('%%', %s, '%%')
         AND User.Username LIKE CONCAT('%%', %s, '%%')
-        AND School.Operator_ID = (SELECT Operator_ID FROM Operator WHERE Username = %s)
+        AND User.School_Name = %s
         GROUP BY User.User_ID, Category.Category_ID
     """
 
-    params = [genre, user_username, operator_username]
+    params = [genre, user_username, result[0]]
 
     cursor.execute(query, params)
     reviews = cursor.fetchall()
@@ -2096,19 +2069,60 @@ def avg_reviews_per_category():
     user_query = """
         SELECT u.Username 
         FROM USER u
-        INNER JOIN School s on s.Name = u.School_Name
-        INNER JOIN Operator o on o.Operator_ID = s.Operator_ID
-        WHERE o.Username = %s
+        WHERE u.School_Name = %s
+        ORDER BY u.Username
     """
-    cursor.execute(user_query, (operator_username,))
+    cursor.execute(user_query, (result[0],))
     users = [user[0] for user in cursor.fetchall()]
 
     # Fetch categories
-    category_query = "SELECT Genre FROM Category"
+    category_query = "SELECT Genre FROM Category ORDER BY GENRE"
     cursor.execute(category_query)
     categories = [category[0] for category in cursor.fetchall()]
 
     return render_template('avg_reviews_per_category.html',genres = categories,users = users, reviews=reviews)
+
+@app.route('/operator/avg_reviews', methods=['GET', 'POST'])
+def avg_reviews():
+    user_username = request.args.get('user_username')
+    genre = request.args.get('genre')
+    operator_id = session.get('id')
+    query = 'SELECT Name FROM School WHERE Operator_ID = %s'
+    cursor.execute(query,(operator_id,))
+    result = cursor.fetchone()
+
+    user_query = """
+        SELECT User.User_ID, User.Username, User.First_Name, User.Last_Name, AVG(Published_Book_Review.Likert_Review) 
+        FROM User
+        INNER JOIN Published_Book_Review ON User.User_ID = Published_Book_Review.User_ID
+        WHERE User.Username = %s
+        GROUP BY User.User_ID
+    """
+    cursor.execute(user_query, (user_username,))
+    user_reviews = cursor.fetchall()
+
+    category_query = """
+        SELECT Category.Genre, AVG(Published_Book_Review.Likert_Review)
+        FROM Category 
+        INNER JOIN Book_Category ON Category.Category_ID = Book_Category.Category_ID
+        INNER JOIN Published_Book_Review ON Book_Category.ISBN = Published_Book_Review.ISBN
+        INNER JOIN User ON Published_Book_Review.User_ID = User.User_ID
+        WHERE Category.Genre = %s
+        AND User.School_Name = %s
+        GROUP BY Category.Category_ID
+    """
+    cursor.execute(category_query, (genre,result[0]))
+    category_reviews = cursor.fetchall()
+
+    cursor.execute("SELECT Username FROM USER WHERE School_Name = %s ORDER BY Username", (result[0],))
+    users = [user[0] for user in cursor.fetchall()]
+
+    cursor.execute("SELECT Genre FROM Category ORDER BY Genre")
+    genres = [genre[0] for genre in cursor.fetchall()]
+
+
+    return render_template('avg_reviews.html',users=users, user_reviews=user_reviews, genres=genres, category_reviews=category_reviews)
+
 
 @app.route('/user/books_by_user', methods=['GET', 'POST'])
 def books_by_user():
