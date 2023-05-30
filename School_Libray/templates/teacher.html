@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teacher Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+
+        ul li {
+            margin-bottom: 10px;
+        }
+
+        ul li:last-child {
+            margin-bottom: 0;
+        }
+
+        ul li a {
+            text-decoration: none;
+            color: #333;
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        ul li a:hover {
+            background-color: #45a049;
+        }
+
+        .error-message {
+            color: red;
+            margin-bottom: 10px;
+        }
+
+        .message{
+            color: green;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    {% if message %}
+        <div class="message">{{ message }}</div>
+    {% endif %}
+    {% if error_message %}
+        <div class="error-message">{{ error_message }}</div>
+    {% endif %} 
+    <h1>Welcome, {{ username }}!</h1>
+    <ul>
+        <li><a href="/user/change_password">Change Password</a></li>
+        <li><a href="/teacher/profile">Modify Data</a></li>
+        <li><a href="/user/books">Books</a></li>
+        <li><a href="/user/reservations">Reservations</a></li>
+        <li><a href="/user/books_by_user">Rented Books</a></li>
+        <li><a href="/user/published_book_reviews">Published Book Reviews</a></li>
+        <li><a href="/delete_account_page">Delete Account</a></li>
+    </ul>
+</body>
+</html>
+{% endblock %}

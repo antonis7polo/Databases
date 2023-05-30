@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Average Reviews per User or Category</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        select {
+            width: 200px;
+            padding: 5px;
+        }
+        input[type="submit"] {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Average Reviews per User or Category</h1>
+
+    <form method="GET" action="/operator/avg_reviews">
+        <label for="user_username">User:</label>
+        <select id="user_username" name="user_username">
+            <option value="">Select User</option>
+            {% for user in users %}
+            <option value="{{ user }}">{{ user }}</option>
+            {% endfor %}
+        </select>
+        <br>
+
+        <label for="genre">Genre:</label>
+        <select id="genre" name="genre">
+            <option value="">Select Genre</option>
+            {% for genre in genres %}
+            <option value="{{ genre }}">{{ genre }}</option>
+            {% endfor %}
+        </select>
+        <br>
+
+        <input type="submit" value="Search">
+    </form>
+
+    <h2>User Reviews</h2>
+    {% if user_reviews %}
+    <table>
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Username</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Average Reviews</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for review in user_reviews %}
+            <tr>
+                <td>{{ review[0] }}</td>
+                <td>{{ review[1] }}</td>
+                <td>{{ review[2] }}</td>
+                <td>{{ review[3] }}</td>
+                <td>{{ review[4]|round(2, 'floor') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No user reviews found.</p>
+    {% endif %}
+
+    <h2>Category Reviews</h2>
+    {% if category_reviews %}
+    <table>
+        <thead>
+            <tr>
+                <th>Genre</th>
+                <th>Average Reviews</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for review in category_reviews %}
+            <tr>
+                <td>{{ review[0] }}</td>
+                <td>{{ review[1]|round(2, 'floor') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No category reviews found.</p>
+    {% endif %}
+</body>
+</html>
+{% endblock %}
