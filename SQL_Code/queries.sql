@@ -8,8 +8,6 @@ WHERE Rental.Rental_Date BETWEEN [start_date] AND [end_date]
 GROUP BY School.Name;
 
 
-DELIMITER ;
-
 --3.1.2 
 SELECT DISTINCT Author.Author_ID, Author.First_Name, Author.Last_Name
 FROM Author
@@ -143,6 +141,7 @@ FROM User
 INNER JOIN Published_Book_Review ON User.User_ID = Published_Book_Review.User_ID 
 INNER JOIN Book_Category ON Published_Book_Review.ISBN = Book_Category.ISBN 
 INNER JOIN Category ON Book_Category.Category_Id = Category.Category_Id 
+INNER JOIN Rental ON User.User_ID = Rental.Rental_ID
 WHERE Category.Genre LIKE CONCAT('%', [genre_value], '%')
 AND User.Username LIKE CONCAT('%', [username_value], '%')
 AND User.School_Name = [school_name_value]
@@ -152,8 +151,8 @@ GROUP BY User.User_ID, Category.Category_ID
 SELECT User.User_ID, User.Username, User.First_Name, User.Last_Name, AVG(Published_Book_Review.Likert_Review) 
 FROM User
 INNER JOIN Published_Book_Review ON User.User_ID = Published_Book_Review.User_ID
+INNER JOIN Rental ON User.User_ID = Rental.Rental_ID
 WHERE User.Username = [username_value]
-
 GROUP BY User.User_ID
 
 SELECT Category.Genre, AVG(Published_Book_Review.Likert_Review)
@@ -161,6 +160,7 @@ FROM Category
 INNER JOIN Book_Category ON Category.Category_ID = Book_Category.Category_ID
 INNER JOIN Published_Book_Review ON Book_Category.ISBN = Published_Book_Review.ISBN
 INNER JOIN User ON Published_Book_Review.User_ID = User.User_ID
+INNER JOIN Rental ON User.User_ID = Rental.Rental_ID
 WHERE Category.Genre = [genre_value]
 AND User.School_Name = %s
 GROUP BY Category.Category_ID
@@ -193,3 +193,4 @@ FROM Rental
 INNER JOIN Book ON Rental.ISBN = Book.ISBN
 INNER JOIN User ON Rental.User_ID = User.User_ID
 WHERE User.Username = [username];
+
