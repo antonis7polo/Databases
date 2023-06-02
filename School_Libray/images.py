@@ -5,14 +5,14 @@ import mysql.connector
 connection = mysql.connector.connect(
         host='localhost',
         user='root',
-        password='El20022!',
+        password='your password',      
         database='School_Library_New'
 )
 
 cursor = connection.cursor()
 
 # Folder to store images
-IMG_FOLDER = "/Users/harrypapadakis/Documents/6th_semester/databases/project/school_lib/static/images"
+IMG_FOLDER = "/your/full/path/to/static/images"
 
 # Ensure the directory exists
 os.makedirs(IMG_FOLDER, exist_ok=True)
