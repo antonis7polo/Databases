@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Book</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+
+        label {
+            font-weight: bold;
+            color: #444;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 5px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0px 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            box-shadow: 0px 2px 10px rgba(0,0,0,0.2);
+            transform: translateY(-2px);
+        }
+
+
+        .error-message {
+            color: red;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    
+    <h1>Add Book</h1>
+    <form method="POST" action="/operator/books/add_book" enctype="multipart/form-data">
+        {{ form.csrf_token }}
+        {% if error_message %}
+        <div class="error-message">{{ error_message }}</div>
+        {% endif %}
+        <div>
+            <label for="isbn">ISBN:</label>
+            {{ form.isbn }}
+        </div>
+        <div>
+            <label for="title">Title:</label>
+            {{ form.title }}
+        </div>
+        <div>
+            <label for="pages">Pages:</label>
+            {{ form.pages }}
+        </div>
+        <div>
+            <label for="publisher">Publisher:</label>
+            {{ form.publisher }}
+        </div>
+        <div>
+            <label for="language">Language:</label>
+            {{ form.language }}
+        </div>
+        <div>
+            <label for="summary">Summary:</label>
+            {{ form.summary }}
+        </div>
+        <div>
+            <label for="image">Book Image:</label>
+            {{ form.image }}
+        </div>           
+        <div>
+            <label for="available_copies">Available Copies:</label>
+            {{ form.available_copies }}
+        </div>
+
+        <h2>Authors</h2>
+        <div>
+            <input type="text" name="authors" placeholder="Enter authors separated by commas, ID is optional" style="width: 400px;" value="1: John Doe, 2: Jane Smith" required>
+        </div>
+
+        <h2>Categories</h2>
+        <div>
+            <input type="text" name="categories" placeholder="Enter categories separated by commas" style="width: 400px;" required>
+        </div>
+
+        <h2>Keywords</h2>
+        <div>
+            <input type="text" name="keywords" placeholder="Enter keywords separated by commas" style="width: 400px;" required>
+        </div>
+
+        <div>
+            <button type="submit" class="btn">Add Book</button>
+        </div>
+    </form>
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Operator Reviews</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .review {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .review h2 {
+            margin-top: 0;
+        }
+
+        .review p {
+            margin-bottom: 5px;
+        }
+
+        .action-buttons {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .action-buttons button {
+            margin-right: 10px;
+            padding: 8px 16px;
+            font-size: 14px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .action-buttons button:hover {
+            background-color: #45a049;
+        }
+
+        .success-message {
+            color: green;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Operator Reviews</h1>
+    {% if message %}
+        <div class="success-message">{{ message }}</div>
+    {% endif %}
+    {% if reviews %}
+        {% for review in reviews %}
+            <div class="review">
+                <h2>{{ review['title'] }}</h2>
+                <p><strong>Username:</strong> {{ review['username'] }}</p>
+                <p><strong>Review Text:</strong> {{ review['review_text'] }}</p>
+                <p><strong>Review Date:</strong> {{ review['review_date'] }}</p>
+                <p><strong>Likert Review:</strong> {{ review['likert_review'] }}</p>
+                <div class="action-buttons">
+                    <form method="POST" action="/operator/reviews">
+                        <input type="hidden" name="review_id" value="{{ review['review_id'] }}">
+                        <button type="submit" name="action" value="publish">Publish</button>
+                        <button type="submit" name="action" value="delete">Delete</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No reviews found.</p>
+    {% endif %}
+</body>
+</html>
+{% endblock %}

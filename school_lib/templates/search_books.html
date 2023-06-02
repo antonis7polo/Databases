@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Operator Book View</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .book {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .search-form {
+            margin-bottom: 20px;
+        }
+
+        .search-form input[type="text"],
+        .search-form input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .search-form button {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .book-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-gap: 20px;
+        }
+
+        .book h2 {
+            margin-top: 0;
+        }
+
+        .book p {
+            margin: 0;
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Operator Book View</h1>
+
+    <div class="container">
+        <form class="search-form" method="GET" action="/operator/search_books" id="search-form">
+            <input type="text" name="search_title" placeholder="Search by title">
+            <input type="text" name="search_category" placeholder="Search by category">
+            <input type="text" name="search_author_first_name" placeholder="Search by author first name">
+            <input type="text" name="search_author_last_name" placeholder="Search by author last name">
+            <input type="number" min="0" name="search_available_copies" id="search-available-copies" placeholder="Search Available Copies">
+            <button type="submit">Search</button>
+        </form>
+
+        {% if message %}
+            <div class="alert alert-info">
+                {{ message }}
+            </div>
+        {% endif %}
+
+        <div class="book-list">
+            {% for book in books %}
+                <div class="book">
+                    <h2>{{ book.title }}</h2>
+                    <img src="{{ url_for('static', filename=book.image_url) }}" alt="Book cover" style="width: 100px; height: 150px;">
+                    <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+                    <p><strong>Authors:</strong> {{ book.authors }}</p>
+                    <p><strong>Genres:</strong> {{ book.genres }}</p>
+                    <p><strong>Keywords:</strong> {{ book.keywords }}</p>
+                    <p><strong>Available Copies:</strong> {{ book.available_copies }}</p>
+                    <p><strong>Summary:</strong> {{ book.summary }}</p>
+
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script>
+        document.getElementById('search-form').addEventListener('submit', function() {
+            let availableCopiesInput = document.getElementById('search-available-copies');
+            if (!availableCopiesInput.value) {
+                availableCopiesInput.value = 0;
+            }
+        });
+    </script>
+</body>
+</html>
+{% endblock %}
