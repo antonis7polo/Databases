@@ -17,7 +17,7 @@ Project for the Databases 2023 class in NTUA ECE that simulates a Database for a
 - Clone this repository using the command `git clone https://github.com/antonis7polo/Databases`
 in a local working directory
 - Use the command `pip install -r requirements.txt` in said directory to download the needed libraries
-- Create the database using a DBSM that supports MySQL/MariaDB and run the scripts `schoolib.sql`  `database_content.sql` and `trigger.sql. Then use the command `python3 images.py`
+- Create the database using a DBSM that supports MySQL/MariaDB and run the scripts `schoolib.sql`  `database_content.sql` and `triggers_after_data_insertion.sql. Then use the command `python3 images.py`
 - Use the command `python3 run.py` and visit `http://localhost:3000/` from a browser
 
 ## Tools Used
