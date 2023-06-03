@@ -12,7 +12,7 @@ connection = mysql.connector.connect(
 cursor = connection.cursor()
 
 # Folder to store images
-IMG_FOLDER = "/your/full/path/to/school_lib/static/images".   #include your path
+IMG_FOLDER = "/your/full/path/to/school_lib/static/images"    #include your path
 
 # Ensure the directory exists
 os.makedirs(IMG_FOLDER, exist_ok=True)
