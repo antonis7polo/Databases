@@ -6,7 +6,7 @@ Project for the Databases 2023 class in NTUA ECE that simulates a Database for a
 - Antonios Alexiadis 03120167
 - Charidimos Papadakis 03120022
 
-## ER Diagram (in Greek)
+## ER Diagram
 ![ER-1](https://github.com/antonis7polo/Databases/assets/75332013/c9158dec-0c83-40cc-8d7f-e4400cb730d3)
 
 ## Relational Model
