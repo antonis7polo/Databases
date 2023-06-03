@@ -10,17 +10,17 @@ import mysql.connector
 app = Flask(__name__)
 
 ## configuration of database
-app.config['SECRET_KEY'] = 'dblab21' # secret key for sessions (signed cookies). Flask uses it to protect the contents of the user session against tampering.
+app.config['SECRET_KEY'] = '' # secret key for sessions (signed cookies). Flask uses it to protect the contents of the user session against tampering.Include your secret key
 app.config["MYSQL_USER"] = 'root'
-app.config["MYSQL_PASSWORD"] = 'El20022!'
+app.config["MYSQL_PASSWORD"] = 'your password' #include your password
 app.config["MYSQL_DB"] = 'School_Library_New'
 app.config["MYSQL_HOST"] = 'localhost'
-app.config["WTF_CSRF_SECRET_KEY"] = 'foo'  ## token for csrf protection of forms.
+app.config["WTF_CSRF_SECRET_KEY"] = ''  ## token for csrf protection of forms. Include you secret key
 
 connection = mysql.connector.connect(
         host='localhost',
         user='root',
-        password='El20022!',
+        password='your_password',
         database='School_Library_New'
 )
 
