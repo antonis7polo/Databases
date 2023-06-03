@@ -7,6 +7,6 @@ Project for the Databases 2023 class in NTUA ECE that simulates a Database for a
 - Charidimos Papadakis 03120022
 
 ## ER Diagram (in Greek)
-![Image Description](/Users/harrypapadakis/Desktop/ER-1.png)
+![Image Description](.git_images/ER-1.png)
 
 
