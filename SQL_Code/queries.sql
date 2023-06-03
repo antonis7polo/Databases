@@ -123,14 +123,14 @@ WHERE o.username = [username]
 SELECT DISTINCT u.User_ID, u.Username, u.First_Name, u.Last_Name
 FROM User u
 INNER JOIN Rental r ON u.user_id = r.user_id
-INNER JOIN School s ON s.Name = u.School_Name
-INNER JOIN Operator o ON o.Operator_ID = s.Operator_ID
 WHERE r.Return_Date IS NULL
   AND DATEDIFF(CURDATE(), r.Rental_Date) > 7
-  AND u.First_Name LIKE CONCAT('%', [first_name], '%')
-  AND u.Last_Name LIKE CONCAT('%', [last_name], '%')
-  AND DATEDIFF(CURDATE(), r.Rental_Date + 7) >= [days]
-  AND o.Username = [operator_username];
+  AND u.First_Name LIKE CONCAT('%%', [first_name], '%%')
+  AND u.Last_Name LIKE CONCAT('%%', [last_name], '%%')
+  AND DATEDIFF(CURDATE(), r.Rental_Date ) >=  7 + [days]
+  AND u.School_Name = [school_name]
+
+
 
 
 
@@ -141,7 +141,6 @@ FROM User
 INNER JOIN Published_Book_Review ON User.User_ID = Published_Book_Review.User_ID 
 INNER JOIN Book_Category ON Published_Book_Review.ISBN = Book_Category.ISBN 
 INNER JOIN Category ON Book_Category.Category_Id = Category.Category_Id 
-INNER JOIN Rental ON User.User_ID = Rental.Rental_ID
 WHERE Category.Genre LIKE CONCAT('%', [genre_value], '%')
 AND User.Username LIKE CONCAT('%', [username_value], '%')
 AND User.School_Name = [school_name_value]
@@ -151,7 +150,6 @@ GROUP BY User.User_ID, Category.Category_ID
 SELECT User.User_ID, User.Username, User.First_Name, User.Last_Name, AVG(Published_Book_Review.Likert_Review) 
 FROM User
 INNER JOIN Published_Book_Review ON User.User_ID = Published_Book_Review.User_ID
-INNER JOIN Rental ON User.User_ID = Rental.Rental_ID
 WHERE User.Username = [username_value]
 GROUP BY User.User_ID
 
@@ -160,7 +158,6 @@ FROM Category
 INNER JOIN Book_Category ON Category.Category_ID = Book_Category.Category_ID
 INNER JOIN Published_Book_Review ON Book_Category.ISBN = Published_Book_Review.ISBN
 INNER JOIN User ON Published_Book_Review.User_ID = User.User_ID
-INNER JOIN Rental ON User.User_ID = Rental.Rental_ID
 WHERE Category.Genre = [genre_value]
 AND User.School_Name = %s
 GROUP BY Category.Category_ID
