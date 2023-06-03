@@ -922,7 +922,7 @@ def reservations_by_operator():
     operator_username = session.get("username")
 
     # Fetch the users connected to the operator's school
-    users_query = "SELECT u.Username FROM User u INNER JOIN School s ON u.School_Name = s.Name INNER JOIN operator o ON s.Operator_id = o.Operator_ID WHERE o.Username = %s"
+    users_query = "SELECT u.Username FROM User u INNER JOIN School s ON u.School_Name = s.Name INNER JOIN operator o ON s.Operator_id = o.Operator_ID WHERE o.Username = %s ORDER BY u.Username"
     cursor.execute(users_query, (operator_username,))
     users_result = cursor.fetchall()
     users = [row[0] for row in users_result]
@@ -989,7 +989,7 @@ def not_overdue_rentals_by_operator():
     operator_username = session.get("username")
 
     # Fetch the users connected to the operator's school
-    users_query = "SELECT u.Username FROM User u INNER JOIN School s ON u.School_Name = s.Name INNER JOIN operator o ON s.Operator_id = o.Operator_ID WHERE o.Username = %s"
+    users_query = "SELECT u.Username FROM User u INNER JOIN School s ON u.School_Name = s.Name INNER JOIN operator o ON s.Operator_id = o.Operator_ID WHERE o.Username = %s ORDER BY u.Username"
     cursor.execute(users_query, (operator_username,))
     users_result = cursor.fetchall()
     users = [row[0] for row in users_result]
@@ -1023,7 +1023,7 @@ def rentals_by_operator():
     operator_username = session.get("username")
 
     # Fetch the users connected to the operator's school
-    users_query = "SELECT u.Username FROM User u INNER JOIN School s ON u.School_Name = s.Name INNER JOIN Operator o ON s.Operator_ID = o.Operator_ID WHERE o.Username = %s"
+    users_query = "SELECT u.Username FROM User u INNER JOIN School s ON u.School_Name = s.Name INNER JOIN Operator o ON s.Operator_ID = o.Operator_ID WHERE o.Username = %s ORDER BY u.Username"
     cursor.execute(users_query, (operator_username,))
     users_result = cursor.fetchall()
     users = [row[0] for row in users_result]
