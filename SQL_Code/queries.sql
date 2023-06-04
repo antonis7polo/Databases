@@ -124,10 +124,9 @@ SELECT DISTINCT u.User_ID, u.Username, u.First_Name, u.Last_Name
 FROM User u
 INNER JOIN Rental r ON u.user_id = r.user_id
 WHERE r.Return_Date IS NULL
-  AND DATEDIFF(CURDATE(), r.Rental_Date) > 7
   AND u.First_Name LIKE CONCAT('%%', [first_name], '%%')
   AND u.Last_Name LIKE CONCAT('%%', [last_name], '%%')
-  AND DATEDIFF(CURDATE(), r.Rental_Date ) >=  7 + [days]
+  AND DATEDIFF(CURDATE(), r.Rental_Date ) >  7 + [days]
   AND u.School_Name = [school_name]
 
 
