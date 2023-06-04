@@ -31,3 +31,17 @@ begin
 end// 
 DELIMITER ;
 
+DELIMITER //
+
+CREATE EVENT delete_old_reservations_event
+ON SCHEDULE
+    EVERY 1 DAY
+    STARTS CURRENT_TIMESTAMP
+DO
+    DELETE FROM Book_Reservation
+    WHERE Reservation_Date < DATE_SUB(CURDATE(), INTERVAL 1 WEEK);
+
+//
+
+DELIMITER ;
+
