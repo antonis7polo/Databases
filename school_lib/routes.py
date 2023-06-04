@@ -171,7 +171,6 @@ def logout():
 def delete_account():
 
     username = session.get('username')
-    print(username)
 
     # Delete the user's account
     cursor.execute("DELETE FROM User WHERE Username = %s", (username,))
@@ -315,14 +314,12 @@ def backup_database():
     db_user = 'root'
     db_name = 'School_Library_New'
     backup_dir = request.form.get('backup_dir')
-    print(backup_dir)
 
 
     backup_filename = 'database_backup.sql'
 
     # Construct the full backup path
     backup_path = f"{backup_dir}/{backup_filename}"
-    print(backup_path)
 
     # Construct the command to perform the database backup using mysqldump
     command = f"mysqldump -h {db_host} -u {db_user} -p  {db_name} > {backup_path}"
@@ -427,8 +424,6 @@ def add_school():
             message = 'School added successfully!'
             return render_template('administrator.html', username=username, message=message)
         except mysql.connector.Error as error:
-            print(error)
-            print(error.errno)
             if error.errno == 1644:
                 error_message = error.msg
             elif error.errno == 1062:
@@ -735,7 +730,6 @@ def add_book():
             school_books_values = (isbn, school_name[0],available_copies)
             cursor.execute(school_books_query, school_books_values)
         except mysql.connector.Error as error:
-            print(error)
             if error.errno == 1062:
                 error_message = 'Book already exists.'
             else:
@@ -777,7 +771,6 @@ def update_book(isbn):
             keywords = request.form.getlist('keywords')
             available_copies = form.available_copies.data
         except AttributeError as error:
-            print(error)
             error_message = 'An error occurred. Check if all fields are correct.'
             return render_template('books.html', error_message = error_message)
  
@@ -1269,11 +1262,9 @@ def operator_users():
             school_name = request.form['school_name']
             date_of_birth = request.form['date_of_birth']
             is_teacher = request.form['is_teacher']
-
-            print(pending_user)
             insert_query = "INSERT INTO User (Username, Password, First_Name, Last_Name, Email, School_Name, Date_Of_Birth, Is_Teacher) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             cursor.execute(insert_query, (username, password, first_name, last_name, email, school_name, date_of_birth, is_teacher))
-            print(cursor.statement)
+           
             connection.commit()
             delete_query = "DELETE FROM Pending_Registrations WHERE Registration_ID = %s"
             cursor.execute(delete_query, (registration_id,))
@@ -1301,7 +1292,6 @@ def user_books():
     query = "SELECT School_Name FROM User WHERE Username = %s"
     cursor.execute(query,(user_username,))
     school_name = cursor.fetchone()
-    print(school_name[0])
 
     query = """
         SELECT DISTINCT b.ISBN
@@ -1384,7 +1374,6 @@ def user_books():
                 cursor.execute(query, values)
                 connection.commit()
             except mysql.connector.Error as err:
-                print(err)
                 if err.errno == 1644:  
                     error_message = err.msg  
                     return render_template('user_books.html', error_message=error_message)
@@ -1586,7 +1575,7 @@ def published_book_reviews():
         ORDER BY r.Review_Date DESC
     """
     cursor.execute(reviews_query,(result[0],))
-    print(cursor.statement)
+  
     reviews = cursor.fetchall()
     message = request.args.get("message")
     return render_template('published_book_reviews.html', reviews=reviews, message = message)
@@ -1918,7 +1907,7 @@ def search_operator_books():
                 'available_copies': book[6],
                 'summary' : book[7]
             }
-            print(book[0], book[6])
+         
             books.append(book_item)
 
 
@@ -2059,7 +2048,6 @@ def books_by_user():
 
     cursor.execute(query, (username,))
     books = cursor.fetchall()
-    print(books)
 
     return render_template('books_by_user.html', books=books)
 
