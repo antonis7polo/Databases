@@ -1945,10 +1945,10 @@ def get_overdue_rentals():
         FROM User u
         INNER JOIN Rental r
         ON u.user_id = r.user_id
-        WHERE r.Return_Date IS NULL
+        WHERE r.Return_Date IS NULL AND DATEDIFF(CURDATE(), r.Rental_Date) > 7
         AND u.First_Name LIKE CONCAT('%%', %s, '%%')
         AND u.Last_Name LIKE CONCAT('%%', %s, '%%')
-        AND DATEDIFF(CURDATE(), r.Rental_Date ) >  7 + %s
+        AND DATEDIFF(CURDATE(), r.Rental_Date ) >=  7 + %s
         AND u.School_Name = %s
     """
 
